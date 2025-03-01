@@ -25,6 +25,7 @@ class ListingsGenerator:
         # openai.api_key = "voc-615907097126677342454766bbd54dcda1a5.27571968"
 
         # client = openai.OpenAI(
+        
         #     api_key="voc-615907097126677342454766bbd54dcda1a5.27571968",
         #     base_url="https://openai.vocareum.com/v1"
         # )

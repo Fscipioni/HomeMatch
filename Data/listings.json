@@ -1,0 +1,112 @@
+[
+    {
+        "Neighborhood": "Bel Air",
+        "City": "Los Angeles",
+        "State": "California",
+        "Price": "$5,000,000",
+        "Bedrooms": 6,
+        "Bathrooms": 7,
+        "House Size": "10,000 sqft",
+        "Description": "Exquisite modern mansion with panoramic views, high-end finishes, and a stunning infinity pool.",
+        "Neighborhood Description": "Bel Air is an exclusive enclave known for its luxury estates and celebrity residents."
+    },
+    {
+        "Neighborhood": "Back Bay",
+        "City": "Boston",
+        "State": "Massachusetts",
+        "Price": "$3,200,000",
+        "Bedrooms": 4,
+        "Bathrooms": 4,
+        "House Size": "6,500 sqft",
+        "Description": "Elegant brownstone with historic charm, gourmet kitchen, and landscaped rooftop terrace.",
+        "Neighborhood Description": "Back Bay is a chic neighborhood known for its Victorian architecture and upscale shopping."
+    },
+    {
+        "Neighborhood": "Pacific Heights",
+        "City": "San Francisco",
+        "State": "California",
+        "Price": "$2,800,000",
+        "Bedrooms": 5,
+        "Bathrooms": 4,
+        "House Size": "5,000 sqft",
+        "Description": "Sophisticated Victorian home with bay views, designer interiors, and a private garden oasis.",
+        "Neighborhood Description": "Pacific Heights offers stunning views of the Golden Gate Bridge and is known for its grand mansions."
+    },
+    {
+        "Neighborhood": "Old Town",
+        "City": "Alexandria",
+        "State": "Virginia",
+        "Price": "$950,000",
+        "Bedrooms": 3,
+        "Bathrooms": 3,
+        "House Size": "2,500 sqft",
+        "Description": "Charming colonial townhouse with modern updates, cozy fireplace, and a peaceful courtyard.",
+        "Neighborhood Description": "Old Town is a historic district with cobblestone streets, boutiques, and waterfront dining."
+    },
+    {
+        "Neighborhood": "Buckhead",
+        "City": "Atlanta",
+        "State": "Georgia",
+        "Price": "$750,000",
+        "Bedrooms": 4,
+        "Bathrooms": 3,
+        "House Size": "3,000 sqft",
+        "Description": "Contemporary ranch-style home with open floor plan, gourmet kitchen, and lush backyard retreat.",
+        "Neighborhood Description": "Buckhead is an upscale neighborhood known for its luxury shopping, fine dining, and vibrant nightlife."
+    },
+    {
+        "Neighborhood": "Pacific Heights",
+        "City": "San Francisco",
+        "State": "California",
+        "Price": "$3,500,000",
+        "Bedrooms": 4,
+        "Bathrooms": 3,
+        "House Size": "3,500 sqft",
+        "Description": "Elegant Victorian home with modern upgrades, stunning views of the Golden Gate Bridge, gourmet kitchen, spacious bedrooms, and beautifully landscaped garden.",
+        "Neighborhood Description": "Pacific Heights is known for its upscale living, historic architecture, boutique shops, and proximity to parks and fine dining."
+    },
+    {
+        "Neighborhood": "Greenwich Village",
+        "City": "New York",
+        "State": "New York",
+        "Price": "$4,200,000",
+        "Bedrooms": 5,
+        "Bathrooms": 4,
+        "House Size": "4,800 sqft",
+        "Description": "Luxurious townhouse in the heart of Greenwich Village, featuring high-end finishes, private garden, rooftop terrace, home theater, and spacious master suite.",
+        "Neighborhood Description": "Greenwich Village offers a vibrant cultural scene, trendy cafes, tree-lined streets, and proximity to Washington Square Park."
+    },
+    {
+        "Neighborhood": "Buckhead",
+        "City": "Atlanta",
+        "State": "Georgia",
+        "Price": "$1,200,000",
+        "Bedrooms": 3,
+        "Bathrooms": 2,
+        "House Size": "2,200 sqft",
+        "Description": "Contemporary ranch-style home with open floor plan, gourmet kitchen, private pool, and outdoor entertaining area, ideal for modern living.",
+        "Neighborhood Description": "Buckhead is an affluent district known for its upscale shopping, fine dining, cultural attractions, and luxury real estate."
+    },
+    {
+        "Neighborhood": "Back Bay",
+        "City": "Boston",
+        "State": "Massachusetts",
+        "Price": "$2,800,000",
+        "Bedrooms": 6,
+        "Bathrooms": 5,
+        "House Size": "5,000 sqft",
+        "Description": "Historic brownstone mansion with original architectural details, grand foyer, formal living spaces, chef's kitchen, wine cellar, and private courtyard.",
+        "Neighborhood Description": "Back Bay is an iconic neighborhood known for its Victorian brownstones, upscale shopping on Newbury Street, and proximity to the Charles River Esplanade."
+    },
+    {
+        "Neighborhood": "Beverly Hills",
+        "City": "Los Angeles",
+        "State": "California",
+        "Price": "$5,000,000",
+        "Bedrooms": 7,
+        "Bathrooms": 5,
+        "House Size": "8,000 sqft",
+        "Description": "Stunning modern estate with panoramic city views, high-end finishes, home gym, home theater, infinity pool, and outdoor kitchen, perfect for luxurious living.",
+        "Neighborhood Description": "Beverly Hills is synonymous with luxury living, celebrity homes, designer boutiques on Rodeo Drive, and exclusive dining experiences."
+    }
+]

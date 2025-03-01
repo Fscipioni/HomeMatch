@@ -1,7 +1,7 @@
 import json
 from uuid import uuid4
 from langchain_openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
 class RealEstateVectorStore:
@@ -54,10 +54,10 @@ class RealEstateVectorStore:
         self.vector_store.add_documents(self.documents)
         print("✅ Listings successfully stored in ChromaDB!")
 
-    # def search(self, query, k=5):
-    #     """Performs a similarity search for a given query."""
-    #     results = self.vector_store.similarity_search(query, k=k)
-    #     return results
+    def search(self, query, k=5):
+        """Performs a similarity search for a given query."""
+        results = self.vector_store.similarity_search(query, k=k)
+        return results
 
 # Usage Example
 if __name__ == "__main__":
