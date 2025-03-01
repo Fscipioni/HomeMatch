@@ -54,10 +54,45 @@ class RealEstateVectorStore:
         self.vector_store.add_documents(self.documents)
         print("✅ Listings successfully stored in ChromaDB!")
 
-    def search(self, query, k=5):
-        """Performs a similarity search for a given query."""
-        results = self.vector_store.similarity_search(query, k=k)
-        return results
+    def format_user_prefs(self, user_prefs):
+        """
+        Converts structured user preferences into a readable search query.
+        
+        Args:
+            user_prefs (dict): The dictionary containing user preferences.
+        
+        Returns:
+            str: A human-readable query string for embedding.
+        """
+        return (
+            f"Looking for a property in {', '.join(user_prefs['city'])}, {', '.join(user_prefs['state'])}. "
+            f"House size preference: {user_prefs['house_size']}. "
+            f"Key factors: {', '.join(user_prefs['key_factors'])}. "
+            f"Amenities: {', '.join(user_prefs['amenities'])}. "
+            f"Preferred transportation: {', '.join(user_prefs['transportation'])}. "
+            f"Urban preference: {user_prefs['urban_preference']}."
+        )
+
+    def search(self, user_prefs, k=5):
+        """Performs a similarity search based on structured user preferences."""
+        try:
+            # 🔹 Convert structured preferences into a natural language search query
+            query = self.format_user_prefs(user_prefs)
+
+            # 🔹 Generate embeddings for the processed query
+            query_embedding = self.embedding_model.embed_query(query)
+            
+            if not isinstance(query_embedding, list):
+                raise ValueError("Embedding function did not return a valid vector list.")
+
+            # 🔹 Perform similarity search using the embedding
+            results = self.vector_store.similarity_search_by_vector(query_embedding, k=k)
+            
+            return results
+        except Exception as e:
+            print(f"❌ Error during search: {e}")
+            return []
+
 
 # Usage Example
 if __name__ == "__main__":
