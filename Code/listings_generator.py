@@ -2,11 +2,12 @@ import json
 import openai
 import time
 import re
+from config_loader import load_config_value
 
 class ListingsGenerator:
     """Handles the generation of real estate listings using OpenAI's API."""
     
-    def __init__(self, total_listings=100, batch_size=20, output_file="../Data/listings.json"):
+    def __init__(self, total_listings=10, batch_size=5, output_file="listings.json"):
         """
         Initializes the listing generator with OpenAI API settings.
         
@@ -20,8 +21,19 @@ class ListingsGenerator:
         self.output_file = output_file
         
         # OpenAI API setup
-        openai.api_base = "https://openai.vocareum.com/v1"
-        openai.api_key = "voc-615907097126677342454766bbd54dcda1a5.27571968"
+        # openai.api_base = "https://openai.vocareum.com/v1"
+        # openai.api_key = "voc-615907097126677342454766bbd54dcda1a5.27571968"
+
+        # client = openai.OpenAI(
+        #     api_key="voc-615907097126677342454766bbd54dcda1a5.27571968",
+        #     base_url="https://openai.vocareum.com/v1"
+        # )
+
+        # openai.api_key = load_config_value("OPENAI_API_KEY")
+
+        client = openai.OpenAI(
+            api_key = load_config_value("OPENAI_API_KEY")
+        )
     
     @staticmethod
     def clean_json_output(response_text):
@@ -31,26 +43,26 @@ class ListingsGenerator:
     def generate_batch(self):
         """Generates a batch of real estate listings using OpenAI."""
         listings_prompt = """
-        You are an experienced real estate agent with extensive knowledge of property listings across all 50 states in the U.S.,
-        spanning diverse neighborhoods from luxury estates to budget-friendly homes.
+            You are an experienced real estate agent with extensive knowledge of property listings across all 50 states in the U.S.,
+            spanning diverse neighborhoods from luxury estates to budget-friendly homes.
 
-        Generate real estate listings following this schema:
+            Generate real estate listings following this schema:
 
-        Neighborhood: A real neighborhood in a randomly selected city
-        City: The city where the property is located
-        State: The state where the property is located
-        Price: The property price, ranging from $100,000 to $5,000,000
-        Bedrooms: Number of bedrooms, ranging from 1 to 15
-        Bathrooms: Number of bathrooms, ranging from 1 to 5
-        House Size: Property size, ranging from 500 sqft to 50,000 sqft
+            Neighborhood: A real neighborhood in a randomly selected city
+            City: The city where the property is located
+            State: The state where the property is located
+            Price: The property price, ranging from $100,000 to $5,000,000
+            Bedrooms: Number of bedrooms, ranging from 1 to 15
+            Bathrooms: Number of bathrooms, ranging from 1 to 5
+            House Size: Property size, ranging from 500 sqft to 50,000 sqft
 
-        Description: A 40-word description of the house.
-        Neighborhood Description: A brief description of the neighborhood.
+            Description: A 40-word description of the house.
+            Neighborhood Description: A brief description of the neighborhood.
 
-        The more expensive the property, the higher the number of bedrooms and bathrooms, the larger the size, 
-        and the more detailed the descriptions of the property and neighborhood.
+            The more expensive the property, the higher the number of bedrooms and bathrooms, the larger the size, 
+            and the more detailed the descriptions of the property and neighborhood.
 
-        Return exactly {} listings in a structured JSON format.
+            Return exactly {} listings in a structured JSON format.
         """.format(self.batch_size)
         
         try:
@@ -62,7 +74,7 @@ class ListingsGenerator:
                 ],
                 temperature=0.7
             )
-            raw_output = response["choices"][0]["message"]["content"]
+            raw_output = response.choices[0].message.content
             clean_output = self.clean_json_output(raw_output)  # Remove ` ```json ` wrapping
             return json.loads(clean_output)["listings"]  # Extract listings from JSON
         except Exception as e:
@@ -85,5 +97,5 @@ class ListingsGenerator:
 
 # Usage Example
 if __name__ == "__main__":
-    generator = ListingsGenerator(total_listings=100, batch_size=20)
+    generator = ListingsGenerator(total_listings=10, batch_size=5)
     generator.generate_listings()

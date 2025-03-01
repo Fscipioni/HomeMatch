@@ -1,0 +1,90 @@
+[
+    {
+        "Neighborhood": "Bel Air",
+        "City": "Los Angeles",
+        "State": "California",
+        "Price": "$4,500,000",
+        "Bedrooms": 6,
+        "Bathrooms": 5,
+        "House Size": "8,000 sqft",
+        "Description": "Luxurious modern estate with stunning views, high-end finishes, and a private pool. This 6-bedroom, 5-bathroom home offers spacious living areas and top-of-the-line amenities.",
+        "Neighborhood Description": "Bel Air is an exclusive neighborhood known for its upscale homes, celebrity residents, and proximity to fine dining and shopping."
+    },
+    {
+        "Neighborhood": "Georgetown",
+        "City": "Washington D.C.",
+        "State": "District of Columbia",
+        "Price": "$2,200,000",
+        "Bedrooms": 4,
+        "Bathrooms": 4,
+        "House Size": "6,500 sqft",
+        "Description": "Elegant townhouse in historic Georgetown featuring 4 bedrooms, 4 bathrooms, gourmet kitchen, and a charming courtyard. This meticulously designed property exudes sophistication and style.",
+        "Neighborhood Description": "Georgetown is a picturesque neighborhood with cobblestone streets, upscale boutiques, and renowned dining options. Its rich history and vibrant culture make it a sought-after location."
+    },
+    {
+        "Neighborhood": "Bel Air",
+        "City": "Los Angeles",
+        "State": "California",
+        "Price": "$4,500,000",
+        "Bedrooms": 5,
+        "Bathrooms": 4,
+        "House Size": "6,000 sqft",
+        "Description": "Stunning modern estate in the prestigious Bel Air neighborhood. This luxurious home features high-end finishes, expansive living spaces, a gourmet kitchen, and lush outdoor areas perfect for entertaining.",
+        "Neighborhood Description": "Bel Air is known for its exclusive gated communities, celebrity residents, and panoramic views of the city. It offers a tranquil escape from the hustle and bustle of Los Angeles."
+    },
+    {
+        "Neighborhood": "Back Bay",
+        "City": "Boston",
+        "State": "Massachusetts",
+        "Price": "$1,200,000",
+        "Bedrooms": 3,
+        "Bathrooms": 2,
+        "House Size": "2,500 sqft",
+        "Description": "Charming brownstone townhouse in the historic Back Bay neighborhood. This elegant home boasts classic architecture, modern amenities, a private courtyard, and easy access to shops and restaurants.",
+        "Neighborhood Description": "Back Bay is renowned for its Victorian brownstones, upscale boutiques, and iconic landmarks like Newbury Street. It offers a sophisticated urban lifestyle with a touch of old-world charm."
+    },
+    {
+        "Neighborhood": "Bel Air",
+        "City": "Los Angeles",
+        "State": "California",
+        "Price": "$4,500,000",
+        "Bedrooms": 6,
+        "Bathrooms": 5,
+        "House Size": "8,000 sqft",
+        "Description": "Stunning contemporary mansion with panoramic views of LA. High-end finishes, expansive living areas, state-of-the-art kitchen, and luxurious master suite. Outdoor pool and entertainment deck.",
+        "Neighborhood Description": "Bel Air is an exclusive neighborhood known for its celebrity residents, upscale shopping, and beautiful hillside estates."
+    },
+    {
+        "Neighborhood": "Soho",
+        "City": "New York",
+        "State": "New York",
+        "Price": "$3,200,000",
+        "Bedrooms": 4,
+        "Bathrooms": 3,
+        "House Size": "3,500 sqft",
+        "Description": "Chic loft-style apartment in the heart of Soho. Open layout, high ceilings, designer finishes, and private terrace. Close to trendy boutiques, art galleries, and gourmet restaurants.",
+        "Neighborhood Description": "Soho is a vibrant and artistic neighborhood known for its cast-iron architecture, cobblestone streets, and bustling art scene."
+    },
+    {
+        "Neighborhood": "Pacific Heights",
+        "City": "San Francisco",
+        "State": "California",
+        "Price": "$4,500,000",
+        "Bedrooms": 5,
+        "Bathrooms": 4,
+        "House Size": "4,500 sqft",
+        "Description": "Stunning modern home with panoramic views of the Golden Gate Bridge. High-end finishes, gourmet kitchen, and expansive outdoor deck for entertaining.",
+        "Neighborhood Description": "Pacific Heights is a prestigious neighborhood known for its Victorian architecture, upscale shops, and proximity to parks."
+    },
+    {
+        "Neighborhood": "Park Slope",
+        "City": "Brooklyn",
+        "State": "New York",
+        "Price": "$1,200,000",
+        "Bedrooms": 3,
+        "Bathrooms": 2,
+        "House Size": "2,000 sqft",
+        "Description": "Charming brownstone townhouse with original details, renovated kitchen, and private backyard oasis. Ideal for families or those seeking a peaceful retreat.",
+        "Neighborhood Description": "Park Slope is a vibrant neighborhood with tree-lined streets, excellent schools, and a diverse culinary scene."
+    }
+]
