@@ -5,7 +5,7 @@ from langchain.vectorstores import Chroma
 from langchain_core.documents import Document
 
 class RealEstateVectorStore:
-    def __init__(self, listings_path="listings.json", db_path="./chroma_langchain_db"):
+    def __init__(self, listings_path="../Data/listings.json", db_path="./chroma_langchain_db"):
         """
         Initializes the vector store by loading listings and setting up ChromaDB.
         """

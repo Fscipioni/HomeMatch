@@ -6,7 +6,7 @@ import re
 class ListingsGenerator:
     """Handles the generation of real estate listings using OpenAI's API."""
     
-    def __init__(self, total_listings=100, batch_size=20, output_file="listings.json"):
+    def __init__(self, total_listings=100, batch_size=20, output_file="../Data/listings.json"):
         """
         Initializes the listing generator with OpenAI API settings.
         
@@ -54,7 +54,7 @@ class ListingsGenerator:
         """.format(self.batch_size)
         
         try:
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create( #openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are an experienced real estate agent."},
