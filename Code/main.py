@@ -7,7 +7,7 @@ from user_preferences import UserPreferenceCollector
 def main():
     """Main script to test the system: Generates listings, populates the vector DB, and simulates user input."""
     
-    listings_path = "listings.json"
+    listings_path = "./Data/listings.json"
     
     # 1️⃣ Generate Listings if Not Present
     if not os.path.exists(listings_path):

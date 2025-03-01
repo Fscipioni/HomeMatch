@@ -7,7 +7,7 @@ from config_loader import load_config_value
 class ListingsGenerator:
     """Handles the generation of real estate listings using OpenAI's API."""
     
-    def __init__(self, total_listings=10, batch_size=5, output_file="listings.json"):
+    def __init__(self, total_listings=10, batch_size=5, output_file="./Data/listings.json"):
         """
         Initializes the listing generator with OpenAI API settings.
         
