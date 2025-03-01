@@ -1,4 +1,0 @@
-%pip install -qU langchain_community jq 
-pip install langchain
-pip install chromadb
-pip install -qU "langchain-chroma"
