@@ -1,5 +1,6 @@
 import json
-import openai
+# import openai
+from openai import OpenAI
 import time
 import re
 from config_loader import load_config_value
@@ -7,7 +8,7 @@ from config_loader import load_config_value
 class ListingsGenerator:
     """Handles the generation of real estate listings using OpenAI's API."""
     
-    def __init__(self, total_listings=10, batch_size=5, output_file="./Data/listings.json"):
+    def __init__(self, total_listings=10, batch_size=5, output_file="../Data/listings.json"):
         """
         Initializes the listing generator with OpenAI API settings.
         
@@ -24,17 +25,16 @@ class ListingsGenerator:
         # openai.api_base = "https://openai.vocareum.com/v1"
         # openai.api_key = "voc-615907097126677342454766bbd54dcda1a5.27571968"
 
-        # client = openai.OpenAI(
-        
-        #     api_key="voc-615907097126677342454766bbd54dcda1a5.27571968",
-        #     base_url="https://openai.vocareum.com/v1"
+        # client = OpenAI(
+        #     base_url="https://openai.vocareum.com/v1",
+        #     api_key="voc-615907097126677342454766bbd54dcda1a5.27571968"            
         # )
 
         # openai.api_key = load_config_value("OPENAI_API_KEY")
 
-        client = openai.OpenAI(
-            api_key = load_config_value("OPENAI_API_KEY")
-        )
+        # client = openai.OpenAI(
+        #     api_key = load_config_value("OPENAI_API_KEY")
+        # )
     
     @staticmethod
     def clean_json_output(response_text):
@@ -65,9 +65,15 @@ class ListingsGenerator:
 
             Return exactly {} listings in a structured JSON format.
         """.format(self.batch_size)
+
+        client = OpenAI(
+            base_url="https://openai.vocareum.com/v1",
+            api_key="voc-615907097126677342454766bbd54dcda1a5.27571968"            
+            )
         
         try:
-            response = openai.chat.completions.create( #openai.ChatCompletion.create(
+
+            response = client.chat.completions.create( #openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are an experienced real estate agent."},
