@@ -1,17 +1,26 @@
+"""
+Module: listings_generator
+Description: Generates structured real estate listings using OpenAI's LLM and realistic images using Stable Diffusion.
+"""
+
 import json
-# import openai
-from openai import OpenAI
 import time
 import re
+import uuid
+import os
+import torch
+from openai import OpenAI
+from PIL import Image
+from diffusers import AutoPipelineForText2Image
 from config_loader import load_config_value
 
 class ListingsGenerator:
-    """Handles the generation of real estate listings using OpenAI's API."""
-    
+    """Generates real estate listings using OpenAI's LLM and realistic images using Stable Diffusion."""
+
     def __init__(self, total_listings=10, batch_size=5, output_file="../Data/listings.json"):
         """
         Initializes the listing generator with OpenAI API settings.
-        
+
         Args:
             total_listings (int): Total number of listings to generate.
             batch_size (int): Number of listings per API request.
@@ -20,60 +29,54 @@ class ListingsGenerator:
         self.total_listings = total_listings
         self.batch_size = batch_size
         self.output_file = output_file
-        
-        # OpenAI API setup
-        # openai.api_base = "https://openai.vocareum.com/v1"
-        # openai.api_key = "voc-615907097126677342454766bbd54dcda1a5.27571968"
 
-        # client = OpenAI(
-        #     base_url="https://openai.vocareum.com/v1",
-        #     api_key="voc-615907097126677342454766bbd54dcda1a5.27571968"            
-        # )
-
-        # openai.api_key = load_config_value("OPENAI_API_KEY")
-
-        # client = openai.OpenAI(
-        #     api_key = load_config_value("OPENAI_API_KEY")
-        # )
-    
     @staticmethod
     def clean_json_output(response_text):
-        """Removes Markdown JSON formatting from OpenAI output."""
+        """
+        Cleans OpenAI's JSON output by removing Markdown formatting.
+
+        Args:
+            response_text (str): Raw response from OpenAI.
+
+        Returns:
+            str: Cleaned JSON string.
+        """
         return re.sub(r"```json\n(.*)\n```", r"\1", response_text, flags=re.DOTALL)
-    
+
     def generate_batch(self):
-        """Generates a batch of real estate listings using OpenAI."""
-        listings_prompt = """
-            You are an experienced real estate agent with extensive knowledge of property listings across all 50 states in the U.S.,
-            spanning diverse neighborhoods from luxury estates to budget-friendly homes.
+        """
+        Generates a batch of real estate listings using OpenAI's LLM.
 
-            Generate real estate listings following this schema:
+        Returns:
+            list: A list of generated property listings (dictionaries).
+        """
+        listings_prompt = f"""
+        You are an experienced real estate agent with extensive knowledge of property listings across all 50 U.S. states,
+        covering a variety of neighborhoods from luxury estates to budget-friendly homes.
 
-            Neighborhood: A real neighborhood in a randomly selected city
-            City: The city where the property is located
-            State: The state where the property is located
-            Price: The property price, ranging from $100,000 to $5,000,000
-            Bedrooms: Number of bedrooms, ranging from 1 to 15
-            Bathrooms: Number of bathrooms, ranging from 1 to 5
-            House Size: Property size, ranging from 500 sqft to 50,000 sqft
+        Generate real estate listings using the following schema:
 
-            Description: A 40-word description of the house.
-            Neighborhood Description: A brief description of the neighborhood.
+        - Neighborhood: A real neighborhood in a randomly selected city
+        - City: The city where the property is located
+        - State: The state where the property is located
+        - Price: The property price, ranging from $100,000 to $5,000,000
+        - Bedrooms: Number of bedrooms, ranging from 1 to 15
+        - Bathrooms: Number of bathrooms, ranging from 1 to 5
+        - House Size: Property size, ranging from 500 sqft to 50,000 sqft
+        - Description: A 40-word description of the house.
+        - Neighborhood Description: A brief description of the neighborhood.
 
-            The more expensive the property, the higher the number of bedrooms and bathrooms, the larger the size, 
-            and the more detailed the descriptions of the property and neighborhood.
-
-            Return exactly {} listings in a structured JSON format.
-        """.format(self.batch_size)
+        Higher-priced properties should have more bedrooms, bathrooms, and larger sizes.
+        Provide exactly {self.batch_size} listings in a structured JSON format.
+        """
 
         client = OpenAI(
             base_url="https://openai.vocareum.com/v1",
-            api_key="voc-615907097126677342454766bbd54dcda1a5.27571968"            
-            )
-        
-        try:
+            api_key=load_config_value("VOCAREUM_OPENAI_API_KEY")
+        )
 
-            response = client.chat.completions.create( #openai.ChatCompletion.create(
+        try:
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are an experienced real estate agent."},
@@ -81,26 +84,102 @@ class ListingsGenerator:
                 ],
                 temperature=0.7
             )
+
             raw_output = response.choices[0].message.content
-            clean_output = self.clean_json_output(raw_output)  # Remove ` ```json ` wrapping
-            return json.loads(clean_output)["listings"]  # Extract listings from JSON
+            clean_output = self.clean_json_output(raw_output)  # Remove Markdown JSON wrapping
+            listings = json.loads(clean_output)["listings"]  # Extract listings from JSON
+
+            # 🔹 Assign a unique ID and generate an image for each listing
+            for listing in listings:
+                listing["id"] = str(uuid.uuid4())
+                listing["image_path"] = self.generate_image(listing)  # Generate & store image path
+
+            return listings
+
         except Exception as e:
             print(f"❌ Error generating batch: {e}")
             return []
 
     def generate_listings(self):
-        """Generates all listings in batches and saves them to a file."""
+        """
+        Generates all real estate listings in batches and saves them to a file.
+        """
         all_listings = []
-        
+
         for _ in range(self.total_listings // self.batch_size):
             batch = self.generate_batch()
             if batch:
                 all_listings.extend(batch)
-                with open(self.output_file, "w") as f:
-                    json.dump(all_listings, f, indent=4)
-            time.sleep(1)  # Avoid rate limits
-        
+
+                # Save listings to file
+                try:
+                    with open(self.output_file, "w") as f:
+                        json.dump(all_listings, f, indent=4)
+                except IOError as e:
+                    print(f"❌ Error saving listings to file: {e}")
+
+            time.sleep(1)  # Prevent rate limit issues
+
         print(f"✅ Successfully generated {len(all_listings)} listings and saved to {self.output_file}")
+
+    def generate_image(self, listing):
+        """
+        Generates an image for a given real estate listing using Stable Diffusion.
+
+        Args:
+            listing (dict): Dictionary containing details about the house.
+
+        Returns:
+            str: Path to the saved generated image, or None if an error occurs.
+        """
+        try:
+            # Select device: prioritize CUDA if available, otherwise use MPS (Mac) or CPU
+            device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+
+            # Load the Stable Diffusion pipeline
+            pipe = AutoPipelineForText2Image.from_pretrained(
+                "stabilityai/sdxl-turbo",
+                torch_dtype=torch.float16,
+                variant="fp16"
+            ).to(device)
+
+            # Construct a safe prompt from the listing details
+            prompt = (
+                f"A realistic image of a house in {listing.get('Neighborhood', 'a neighborhood')}, "
+                f"{listing.get('City', 'a city')}, {listing.get('State', 'a state')}. "
+                f"It has {listing.get('Bedrooms', 'an unknown number of')} bedrooms, "
+                f"{listing.get('Bathrooms', 'an unknown number of')} bathrooms, and is "
+                f"{listing.get('House Size', 'unknown')} sqft. "
+                f"{listing.get('Description', 'A lovely house.')}"
+            )
+
+            # Ensure random generator is properly seeded
+            torch.manual_seed(423122981)
+
+            # Generate the image
+            print(f"🖼️ Generating image for listing in {listing.get('City', 'Unknown City')}...")
+            image = pipe(
+                prompt=prompt,
+                num_inference_steps=1,
+                guidance_scale=1.0,
+                negative_prompt=["overexposed", "underexposed", "low quality", "unrealistic", "artifacts", "distortion"]
+            ).images[0]
+
+            # Ensure output directory exists
+            image_dir = "../Data/Images"
+            os.makedirs(image_dir, exist_ok=True)
+
+            # Save the image with the listing's unique ID
+            image_path = os.path.join(image_dir, f"{listing.get('id', 'unknown')}.png")
+            image.save(image_path)
+
+            print(f"✅ Image saved: {image_path}")
+            return image_path
+
+        except Exception as e:
+            print(f"❌ Error generating image: {e}")
+            return None
+
 
 # Usage Example
 if __name__ == "__main__":
