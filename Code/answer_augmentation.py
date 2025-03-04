@@ -1,17 +1,28 @@
+"""
+Module: answer_augmentation
+Description: Uses an LLM to enhance real estate listing descriptions for better personalization.
+"""
+
 import json
+import os
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
-from config_loader import load_config_value
+from config_loader import load_config_value  # Ensure this is correctly implemented
 
 class LlmAugmentation:
     """Handles LLM-based augmentation of real estate listings."""
 
     def __init__(self):
-        """Initializes the LLM model using LangChain."""
+        """
+        Initializes the LLM model using LangChain.
+        """
+        # Load API credentials securely (avoid hardcoding API keys)
+        os.environ["OPENAI_API_KEY"] = load_config_value("VOCAREUM_OPENAI_API_KEY")
+        os.environ["OPENAI_API_BASE"] = "https://openai.vocareum.com/v1"
+
         self.llm = ChatOpenAI(
             model_name="gpt-3.5-turbo",
-            temperature=0.7,
-            openai_api_key=load_config_value("OPENAI_API_KEY")
+            temperature=0.7
         )
 
         # Define the LLM prompt template
@@ -37,13 +48,15 @@ class LlmAugmentation:
         Uses the LLM to augment property descriptions for better personalization.
 
         Args:
-            user_prompt (str): The user's home preference details.
             listings (list): A list of retrieved real estate listings (dictionaries).
 
         Returns:
             list: A list of augmented listing descriptions.
         """
         try:
+            if not listings:
+                raise ValueError("Listings data is empty. Cannot generate augmented descriptions.")
+
             # Format listings into readable JSON
             listings_text = json.dumps(listings, indent=2)
 
@@ -52,49 +65,13 @@ class LlmAugmentation:
                 self.llm_prompt.format(n_answers=len(listings), listings=listings_text)
             )
 
-            # Extract LLM response
+            # Ensure response is valid
+            if not response or not hasattr(response, "content"):
+                raise ValueError("Received invalid response from LLM.")
+
             return response.content.strip()
-        
+
         except Exception as e:
             print(f"❌ Error generating augmented descriptions: {e}")
             return []
 
-# Example Usage
-if __name__ == "__main__":
-    # Initialize the augmentation class
-    llm_augmentor = LlmAugmentation()
-
-    # Example user preferences (can be passed from `UserPreferenceCollector`)
-    user_prompt = "Looking for a spacious suburban home with a large backyard, modern kitchen, and easy access to public transit."
-
-    # Example listings (retrieved from the vector database)
-    listings = [
-        {
-            "Neighborhood": "Sunnyvale",
-            "City": "San Francisco",
-            "State": "CA",
-            "Price": 1500000,
-            "Bedrooms": 3,
-            "Bathrooms": 2,
-            "House Size": "1800 sqft",
-            "Description": "A beautiful 3-bedroom home with an open-plan kitchen.",
-            "Neighborhood Description": "Family-friendly neighborhood with great parks."
-        },
-        {
-            "Neighborhood": "Downtown Denver",
-            "City": "Denver",
-            "State": "CO",
-            "Price": 900000,
-            "Bedrooms": 2,
-            "Bathrooms": 2,
-            "House Size": "1300 sqft",
-            "Description": "Modern condo with floor-to-ceiling windows and city views.",
-            "Neighborhood Description": "Vibrant area with excellent dining and nightlife."
-        }
-    ]
-
-    # Generate personalized descriptions
-    augmented_listings = llm_augmentor.generate_augmented_descriptions(listings)
-    
-    # Display results
-    print("\n📌 Augmented Listings Descriptions:\n", augmented_listings)

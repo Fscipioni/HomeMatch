@@ -9,6 +9,7 @@ import re
 import uuid
 import os
 import torch
+import random
 from openai import OpenAI
 from PIL import Image
 from diffusers import AutoPipelineForText2Image
@@ -67,7 +68,9 @@ class ListingsGenerator:
         - Neighborhood Description: A brief description of the neighborhood.
 
         Higher-priced properties should have more bedrooms, bathrooms, and larger sizes.
-        Provide exactly {self.batch_size} listings in a structured JSON format.
+
+        📌 Provide the response **strictly** as a JSON object with the key "listings", 
+        where "listings" is a list of dictionary objects.
         """
 
         client = OpenAI(
@@ -82,12 +85,30 @@ class ListingsGenerator:
                     {"role": "system", "content": "You are an experienced real estate agent."},
                     {"role": "user", "content": listings_prompt}
                 ],
-                temperature=0.7
+                temperature=0.8
             )
 
             raw_output = response.choices[0].message.content
             clean_output = self.clean_json_output(raw_output)  # Remove Markdown JSON wrapping
-            listings = json.loads(clean_output)["listings"]  # Extract listings from JSON
+            
+            # print("🔍 Raw OpenAI Output:\n", clean_output)  # Debugging
+
+            # Try parsing JSON safely
+            try:
+                listings_json = json.loads(clean_output)
+                # print("✅ Parsed JSON Structure:", listings_json)  # Debugging
+                
+                if "listings" not in listings_json or not isinstance(listings_json["listings"], list):
+                    raise ValueError("❌ 'listings' key missing or not a list in OpenAI response.")
+
+                listings = listings_json["listings"]
+
+            except json.JSONDecodeError as e:
+                print(f"❌ JSON Decoding Error: {e}")
+                return []
+            except Exception as e:
+                print(f"❌ Unexpected Error in JSON parsing: {e}")
+                return []
 
             # 🔹 Assign a unique ID and generate an image for each listing
             for listing in listings:
@@ -99,7 +120,7 @@ class ListingsGenerator:
         except Exception as e:
             print(f"❌ Error generating batch: {e}")
             return []
-
+    
     def generate_listings(self):
         """
         Generates all real estate listings in batches and saves them to a file.
@@ -145,16 +166,20 @@ class ListingsGenerator:
 
             # Construct a safe prompt from the listing details
             prompt = (
-                f"A realistic image of a house in {listing.get('Neighborhood', 'a neighborhood')}, "
-                f"{listing.get('City', 'a city')}, {listing.get('State', 'a state')}. "
-                f"It has {listing.get('Bedrooms', 'an unknown number of')} bedrooms, "
-                f"{listing.get('Bathrooms', 'an unknown number of')} bathrooms, and is "
+                f"A {random.choice(['modern', 'classic', 'Victorian', 'Mediterranean', 'ranch-style'])} house in "
+                f"{listing.get('Neighborhood', 'a neighborhood')}, {listing.get('City', 'a city')}, {listing.get('State', 'a state')}. "
+                # f"It has {listing.get('Bedrooms', 'an unknown number of')} bedrooms, "
+                # f"{listing.get('Bathrooms', 'an unknown number of')} bathrooms, and is "
                 f"{listing.get('House Size', 'unknown')} sqft. "
-                f"{listing.get('Description', 'A lovely house.')}"
-            )
+                f"The house features a {random.choice(['red brick', 'white stucco', 'blue wooden', 'gray stone', 'tan adobe'])} exterior, "
+                f"a {random.choice(['spacious front yard', 'lush garden', 'swimming pool', 'rooftop terrace', 'wraparound porch'])}, and "
+                f"{listing.get('Description', 'a beautiful architectural design')}."
+                )
 
-            # Ensure random generator is properly seeded
-            torch.manual_seed(423122981)
+            # Use a unique random seed for each image.
+            # This ensures each house image is unique but still reproducible if needed.
+            random_seed = random.randint(1, 1_000_000)  
+            torch.manual_seed(random_seed)  # Different seed for each listing
 
             # Generate the image
             print(f"🖼️ Generating image for listing in {listing.get('City', 'Unknown City')}...")
@@ -180,8 +205,3 @@ class ListingsGenerator:
             print(f"❌ Error generating image: {e}")
             return None
 
-
-# Usage Example
-if __name__ == "__main__":
-    generator = ListingsGenerator(total_listings=10, batch_size=5)
-    generator.generate_listings()

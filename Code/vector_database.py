@@ -1,23 +1,33 @@
+"""
+Module: vector_database
+Description: Handles storing and searching real estate listings using ChromaDB and OpenAI embeddings.
+"""
+
 import json
-from uuid import uuid4
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
 class RealEstateVectorStore:
+    """Handles vector-based storage and retrieval of real estate listings using ChromaDB."""
+
     def __init__(self, listings_path="../Data/listings.json", db_path="../Data/chroma_langchain_db"):
         """
-        Initializes the vector store by loading listings and setting up ChromaDB.
+        Initializes the vector store by loading real estate listings and setting up ChromaDB.
+
+        Args:
+            listings_path (str): Path to the JSON file containing real estate listings.
+            db_path (str): Path to the directory where ChromaDB stores embeddings.
         """
         self.listings_path = listings_path
         self.db_path = db_path
         self.embedding_model = OpenAIEmbeddings(model="text-embedding-3-large")
-        
-        # Load Listings
+
+        # Load and process listings
         self.listings = self._load_listings()
         self.documents = self._prepare_documents()
-        
-        # Initialize ChromaDB
+
+        # Initialize ChromaDB for storage
         self.vector_store = Chroma(
             collection_name="real_estate_listings",
             embedding_function=self.embedding_model,
@@ -25,17 +35,31 @@ class RealEstateVectorStore:
         )
 
     def _load_listings(self):
-        """Loads the real estate listings from a JSON file."""
-        with open(self.listings_path, "r") as f:
-            return json.load(f)
+        """
+        Loads real estate listings from a JSON file.
+
+        Returns:
+            list: A list of real estate listings.
+        """
+        try:
+            with open(self.listings_path, "r") as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"❌ Error loading listings file: {e}")
+            return []
 
     def _prepare_documents(self):
-        """Converts listings into Document objects with metadata."""
+        """
+        Converts listings into Document objects with metadata.
+
+        Returns:
+            list: A list of Document objects with structured metadata.
+        """
         return [
             Document(
-                page_content=listing["Description"],  # Store main listing text
+                page_content=listing["Description"],  # Store property description
                 metadata={
-                    "id": str(uuid4()),  # Unique ID
+                    "id": listing["id"],  
                     "neighborhood": listing["Neighborhood"],
                     "city": listing["City"],
                     "state": listing["State"],
@@ -50,56 +74,103 @@ class RealEstateVectorStore:
         ]
 
     def store_listings(self):
-        """Stores embeddings and metadata in ChromaDB."""
-        self.vector_store.add_documents(self.documents)
-        print("✅ Listings successfully stored in ChromaDB!")
+        """
+        Stores real estate listings in ChromaDB.
+        """
+        try:
+            self.vector_store.add_documents(self.documents)
+            print("✅ Listings successfully stored in ChromaDB!")
+        except Exception as e:
+            print(f"❌ Error storing listings: {e}")
 
     def format_user_prefs(self, user_prefs):
         """
         Converts structured user preferences into a readable search query.
-        
+
         Args:
-            user_prefs (dict): The dictionary containing user preferences.
-        
+            user_prefs (dict): Dictionary containing user preferences.
+
         Returns:
-            str: A human-readable query string for embedding.
+            str: A natural language query string for embedding.
         """
-        return (
-            f"Looking for a property in {', '.join(user_prefs['city'])}, {', '.join(user_prefs['state'])}. "
-            f"House size preference: {user_prefs['house_size']}. "
-            f"Key factors: {', '.join(user_prefs['key_factors'])}. "
-            f"Amenities: {', '.join(user_prefs['amenities'])}. "
-            f"Preferred transportation: {', '.join(user_prefs['transportation'])}. "
-            f"Urban preference: {user_prefs['urban_preference']}."
-        )
+        try:
+            return (
+                f"Looking for a property in {', '.join(user_prefs.get('city', []))}, {', '.join(user_prefs.get('state', []))}. "
+                f"House size preference: {user_prefs.get('house_size', 'any size')}. "
+                f"Key factors: {', '.join(user_prefs.get('key_factors', []))}. "
+                f"Amenities: {', '.join(user_prefs.get('amenities', []))}. "
+                f"Preferred transportation: {', '.join(user_prefs.get('transportation', []))}. "
+                f"Urban preference: {user_prefs.get('urban_preference', 'no preference')}."
+            )
+        except Exception as e:
+            print(f"❌ Error formatting user preferences: {e}")
+            return ""
 
     def search(self, user_prefs, k=5):
-        """Performs a similarity search based on structured user preferences."""
+        """
+        Performs a similarity search based on user preferences and retrieves matching listings with images.
+
+        Args:
+            user_prefs (dict): Dictionary containing user search preferences.
+            k (int): Number of top matches to return.
+
+        Returns:
+            list: A list of dictionaries containing listing details and image paths.
+        """
         try:
-            # 🔹 Convert structured preferences into a natural language search query
+            # Convert user preferences into a natural language query
             query = self.format_user_prefs(user_prefs)
 
-            # 🔹 Generate embeddings for the processed query
+            # Generate embeddings for the query
             query_embedding = self.embedding_model.embed_query(query)
-            
-            if not isinstance(query_embedding, list):
-                raise ValueError("Embedding function did not return a valid vector list.")
 
-            # 🔹 Perform similarity search using the embedding
+            if not isinstance(query_embedding, list):
+                raise ValueError("❌ Embedding function did not return a valid vector list.")
+
+            # Perform similarity search using the embedding
             results = self.vector_store.similarity_search_by_vector(query_embedding, k=k)
-            
-            return results
+
+            # Extract relevant metadata, including image paths
+            listings_with_images = [
+                {
+                    "description": doc.page_content,
+                    "id": doc.metadata.get("id"),
+                    "city": doc.metadata.get("city", "Unknown"),
+                    "state": doc.metadata.get("state", "Unknown"),
+                    "price": doc.metadata.get("price", "N/A"),
+                    "bedrooms": doc.metadata.get("bedrooms", "N/A"),
+                    "bathrooms": doc.metadata.get("bathrooms", "N/A"),
+                    "house_size": doc.metadata.get("house_size", "N/A"),
+                    "neighborhood": doc.metadata.get("neighborhood", "Unknown"),
+                    "neighborhood_description": doc.metadata.get("neighborhood_description", ""),
+                    "image_path": doc.metadata.get("image_path", "❌ No image available")  # Ensure image path is included
+                }
+                for doc in results
+            ]
+
+            return listings_with_images
+
         except Exception as e:
             print(f"❌ Error during search: {e}")
             return []
-
 
 # Usage Example
 if __name__ == "__main__":
     real_estate_db = RealEstateVectorStore()
     real_estate_db.store_listings()
     
-    # # Example Query
-    # search_results = real_estate_db.search("luxury house with ocean view", k=3)
-    # for result in search_results:
-    #     print(result.metadata)
+    # Example User Preferences
+    user_prefs = {
+        "city": ["San Francisco"],
+        "state": ["California"],
+        "house_size": "2000-3000 sqft",
+        "key_factors": ["proximity to public transport", "low crime rate"],
+        "amenities": ["gym", "swimming pool"],
+        "transportation": ["bus", "subway"],
+        "urban_preference": "suburban"
+    }
+
+    search_results = real_estate_db.search(user_prefs, k=3)
+    
+    for result in search_results:
+        print(result.metadata)

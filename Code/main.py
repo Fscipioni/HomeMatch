@@ -41,12 +41,12 @@ def main():
 
     # 🔹 Convert Document objects to JSON-serializable dictionaries
     listings = [
-        {
-            "description": doc.page_content,  # Property description
-            **doc.metadata  # Unpack all metadata
-        }
-        for doc in retrieved_documents
-    ]
+    {
+        "description": doc.get("page_content", "No description available"),  # Get description from dict
+        **doc.get("metadata", {})  # Get metadata safely
+    }
+    for doc in retrieved_documents
+]
 
     # 4️⃣ LLM-Based Augmentation to Improve Listings Descriptions
     llm_augm = LlmAugmentation()
