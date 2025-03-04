@@ -8,7 +8,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-class RealEstateVectorStore:
+class VectorDatabase:
     """Handles vector-based storage and retrieval of real estate listings using ChromaDB."""
 
     def __init__(self, listings_path="../Data/listings.json", db_path="../Data/chroma_langchain_db"):
@@ -68,6 +68,7 @@ class RealEstateVectorStore:
                     "bathrooms": listing["Bathrooms"],
                     "house_size": listing["House Size"],
                     "neighborhood_description": listing["Neighborhood Description"],
+                    "image_path": listing["image_path"]
                 }
             )
             for listing in self.listings
@@ -83,6 +84,7 @@ class RealEstateVectorStore:
         except Exception as e:
             print(f"❌ Error storing listings: {e}")
 
+
     def format_user_prefs(self, user_prefs):
         """
         Converts structured user preferences into a readable search query.
@@ -97,10 +99,11 @@ class RealEstateVectorStore:
             return (
                 f"Looking for a property in {', '.join(user_prefs.get('city', []))}, {', '.join(user_prefs.get('state', []))}. "
                 f"House size preference: {user_prefs.get('house_size', 'any size')}. "
-                f"Key factors: {', '.join(user_prefs.get('key_factors', []))}. "
+                f"Maximum price: {user_prefs.get('max_price', '100000')}. "
+                f"Number of Bedrooms: {user_prefs.get('num_bedrooms', 3)}. "
+                f"Number of Bathrooms: {user_prefs.get('num_bathrooms', 3)}. "
                 f"Amenities: {', '.join(user_prefs.get('amenities', []))}. "
-                f"Preferred transportation: {', '.join(user_prefs.get('transportation', []))}. "
-                f"Urban preference: {user_prefs.get('urban_preference', 'no preference')}."
+                f"Property description: {user_prefs.get('description', 'no preference')}."
             )
         except Exception as e:
             print(f"❌ Error formatting user preferences: {e}")
@@ -130,6 +133,8 @@ class RealEstateVectorStore:
             # Perform similarity search using the embedding
             results = self.vector_store.similarity_search_by_vector(query_embedding, k=k)
 
+            print('Original results: ', results, '\n')
+
             # Extract relevant metadata, including image paths
             listings_with_images = [
                 {
@@ -154,23 +159,3 @@ class RealEstateVectorStore:
             print(f"❌ Error during search: {e}")
             return []
 
-# Usage Example
-if __name__ == "__main__":
-    real_estate_db = RealEstateVectorStore()
-    real_estate_db.store_listings()
-    
-    # Example User Preferences
-    user_prefs = {
-        "city": ["San Francisco"],
-        "state": ["California"],
-        "house_size": "2000-3000 sqft",
-        "key_factors": ["proximity to public transport", "low crime rate"],
-        "amenities": ["gym", "swimming pool"],
-        "transportation": ["bus", "subway"],
-        "urban_preference": "suburban"
-    }
-
-    search_results = real_estate_db.search(user_prefs, k=3)
-    
-    for result in search_results:
-        print(result.metadata)

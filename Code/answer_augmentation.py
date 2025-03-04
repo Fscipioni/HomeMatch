@@ -22,7 +22,7 @@ class LlmAugmentation:
 
         self.llm = ChatOpenAI(
             model_name="gpt-3.5-turbo",
-            temperature=0.7
+            temperature=0.9
         )
 
         # Define the LLM prompt template
@@ -33,8 +33,10 @@ class LlmAugmentation:
             Each listing matches the buyer’s preferences in terms of location, property features, amenities, and neighborhood.
 
             Your task:
-            - **Enhance the property descriptions**: Subtly emphasize features that align with the buyer's specific preferences.
+            - **Enhance the property descriptions**: Subtly emphasize features of the property to make it appealing to possible buyers.
             - **Maintain factual integrity**: Do not add fictional information. Keep the facts unchanged while improving appeal.
+            - **Do NOT** use bullet points or numered lists. Separate the listings by a new blank line.
+            - **Recommended lenght**: Use between 80 to 120 words.
 
             Here are the listings:
             {listings}

@@ -9,7 +9,7 @@ import re
 class UserPreferenceCollector:
     """Handles user input collection and parsing into structured preferences."""
 
-    def __init__(self, interactive=True, use_llm=True):
+    def __init__(self, use_llm=True):
         """
         Initializes the preference collector.
 
@@ -17,27 +17,27 @@ class UserPreferenceCollector:
             interactive (bool): If True, prompts user for input interactively.
             use_llm (bool): If True, uses an LLM to refine user input.
         """
-        self.interactive = interactive
+        # self.interactive = interactive
         self.use_llm = use_llm
-        self.questions = [
-            "In which state(s) would you like to look for a property?",
-            "Which city or cities?",
-            "How big do you want your house to be?",
-            "What are the three most important factors for you in choosing this property?",
-            "Which amenities would you like?",
-            "Which transportation options are important to you?",
-            "How urban do you want your neighborhood to be?"
-        ]
+        # self.questions = [
+        #     "In which state(s) would you like to look for a property?",
+        #     "Which city or cities?",
+        #     "How big do you want your house to be?",
+        #     "What are the three most important factors for you in choosing this property?",
+        #     "Which amenities would you like?",
+        #     "Which transportation options are important to you?",
+        #     "How urban do you want your neighborhood to be?"
+        # ]
         
-        self.default_answers = [
-            "California, Colorado",
-            "Mountain View, Cupertino, Denver",
-            "A comfortable three-bedroom house with a spacious kitchen and a cozy living room.",
-            "A quiet neighborhood, good local schools, convenient shopping options.",
-            "Backyard for gardening, two-car garage, energy-efficient heating system.",
-            "Reliable bus line, proximity to a major highway, bike-friendly roads.",
-            "A balance between suburban tranquility and urban amenities like restaurants and theaters."
-        ]
+        # self.default_answers = [
+        #     "California, Colorado",
+        #     "Mountain View, Cupertino, Denver",
+        #     "A comfortable three-bedroom house with a spacious kitchen and a cozy living room.",
+        #     "A quiet neighborhood, good local schools, convenient shopping options.",
+        #     "Backyard for gardening, two-car garage, energy-efficient heating system.",
+        #     "Reliable bus line, proximity to a major highway, bike-friendly roads.",
+        #     "A balance between suburban tranquility and urban amenities like restaurants and theaters."
+        # ]
 
     def call_llm(self, text):
         """
@@ -74,26 +74,26 @@ class UserPreferenceCollector:
             print(f"❌ LLM Error: {e}")
             return text  # Return original input if LLM fails
 
-    def collect_preferences(self):
-        """
-        Collects buyer preferences interactively or using default responses.
+    # def collect_preferences(self):
+    #     """
+    #     Collects buyer preferences interactively or using default responses.
 
-        Returns:
-            dict: Structured dictionary of user preferences.
-        """
-        if self.interactive:
-            print("\n🏡 Home Preference Questionnaire 🏡\n")
-            print("Please answer the following questions to get a personalized home recommendation.")
-            print("Your responses will help us find the best listings that match your preferences.\n")
-            answers = [input(f"{q} ") for q in self.questions]
-        else:
-            answers = self.default_answers
+    #     Returns:
+    #         dict: Structured dictionary of user preferences.
+    #     """
+    #     if self.interactive:
+    #         print("\n🏡 Home Preference Questionnaire 🏡\n")
+    #         print("Please answer the following questions to get a personalized home recommendation.")
+    #         print("Your responses will help us find the best listings that match your preferences.\n")
+    #         answers = [input(f"{q} ") for q in self.questions]
+    #     else:
+    #         answers = self.default_answers
 
-        # Process responses with LLM if enabled
-        if self.use_llm:
-            answers = [self.call_llm(answer) for answer in answers]
+    #     # Process responses with LLM if enabled
+    #     if self.use_llm:
+    #         answers = [self.call_llm(answer) for answer in answers]
 
-        return self.parse_preferences(answers)
+    #     return self.parse_preferences(answers)
 
     def parse_preferences(self, answers):
         """
