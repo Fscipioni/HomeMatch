@@ -1,6 +1,5 @@
 import gradio as gr
 import openai
-from vector_database import VectorDatabase 
 from answer_augmentation import LlmAugmentation
 
 # Initialize VectorDatabase
@@ -92,22 +91,20 @@ def create_gradio_interface(vector_db):
         with gr.Row():
             state = gr.Textbox(label="State", placeholder="Enter the state (e.g., California)")
             city = gr.Textbox(label="City", placeholder="Enter the city (e.g., San Francisco)")
-
-        with gr.Row():
             house_size = gr.Textbox(label="House Size (sq ft)", placeholder="e.g., 2000")
             max_price = gr.Textbox(label="Maximum Price", placeholder="e.g., 500000")
 
         with gr.Row():
-            num_bedrooms = gr.Slider(1, 10, step=1, label="Number of Bedrooms", value=3)
-            num_bathrooms = gr.Slider(1, 10, step=1, label="Number of Bathrooms", value=3)
+            amenities = gr.CheckboxGroup(["Pool", "Garage", "Garden", "Gym", "Fireplace", "Balcony", "Basement"], label="Select Amenities")
+            description = gr.Textbox(label="Description", placeholder="Additional details about the house...")
+            with gr.Column(scale=1):
+                num_bedrooms = gr.Slider(1, 10, step=1, label="Number of Bedrooms", value=3)
+                num_bathrooms = gr.Slider(1, 10, step=1, label="Number of Bathrooms", value=3)
+            
+            with gr.Column(scale=1):
+                num_listings = gr.Slider(1, 10, step=1, label="How many listings do you wish to see?", value=3)
+                search_button = gr.Button("Search")
 
-        amenities = gr.CheckboxGroup(["Pool", "Garage", "Garden", "Gym", "Fireplace", "Balcony", "Basement"], label="Select Amenities")
-
-        description = gr.Textbox(label="Description", placeholder="Additional details about the house...")
-
-        num_listings = gr.Slider(1, 10, step=1, label="How many listings do you wish to see?", value=3)
-
-        search_button = gr.Button("Search")
 
         # **Results Display**
         with gr.Row():
