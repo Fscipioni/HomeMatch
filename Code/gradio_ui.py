@@ -72,7 +72,6 @@ def create_gradio_interface(vector_db):
                 f"{result['bedrooms']} Bed | {result['bathrooms']} Bath | {result['house_size']} sq ft", # Title
                 f"${result['price']}",
                 f"{result['city']}, {result['state']}",
-                result["description"],
                 augmented_results[i] if i < len(augmented_results) else "N/A"
             ]
             for i, result in enumerate(search_results)
@@ -113,13 +112,16 @@ def create_gradio_interface(vector_db):
         # **Results Display**
         with gr.Row():
             results_output = gr.Dataframe(
-                headers=["Title", "Price", "Location", "Description", "AI-Enhanced Notes"],
-                datatype=["str", "str", "str", "str", "str"],
+                headers=["Title", "Price", "Location", "Description"],
+                datatype=["str", "str", "str", "str"],
                 interactive=False,
                 wrap=True
             )
 
         image_output = gr.Gallery(label="Listing Images")
+
+        print('results_output ', results_output)
+        print('image_output', image_output)
 
         # **Button Action**
         search_button.click(

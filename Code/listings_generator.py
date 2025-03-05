@@ -15,6 +15,18 @@ from PIL import Image
 from diffusers import AutoPipelineForText2Image
 from config_loader import load_config_value
 
+# 🔹 Load city choices from file
+def load_city_choices(file_path="../Data/city_choices.txt"):
+    city_list = []
+    try:
+        with open(file_path, "r") as f:
+            for line in f:
+                city, state = line.strip().split(", ")
+                city_list.append({"city": city, "state": state})
+    except Exception as e:
+        print(f"❌ Error loading city choices: {e}")
+    return city_list
+
 class ListingsGenerator:
     """Generates real estate listings using OpenAI's LLM and realistic images using Stable Diffusion."""
 
@@ -30,6 +42,7 @@ class ListingsGenerator:
         self.total_listings = total_listings
         self.batch_size = batch_size
         self.output_file = output_file
+        self.city_choices = load_city_choices()
 
     @staticmethod
     def clean_json_output(response_text):
@@ -51,21 +64,35 @@ class ListingsGenerator:
         Returns:
             list: A list of generated property listings (dictionaries).
         """
+
+        city_data = random.choice(self.city_choices) if self.city_choices else {"city": "Unknown", "state": "Unknown"}
+
+        property_type = random.choice([
+            {"type": "Studio Apartment", "min_price": 60000, "max_price": 180000, "size_range": (400, 800), "bed_range": (1, 1), "bath_range": (1, 1)},
+            {"type": "One-Bedroom Apartment", "min_price": 100000, "max_price": 250000, "size_range": (600, 1000), "bed_range": (1, 2), "bath_range": (1, 2)},
+            {"type": "Townhouse", "min_price": 150000, "max_price": 500000, "size_range": (1000, 2500), "bed_range": (2, 4), "bath_range": (1, 3)},
+            {"type": "Single-Family Home", "min_price": 200000, "max_price": 800000, "size_range": (1200, 3500), "bed_range": (3, 6), "bath_range": (2, 4)},
+            {"type": "Luxury Estate", "min_price": 1000000, "max_price": 5000000, "size_range": (4000, 15000), "bed_range": (5, 15), "bath_range": (3, 6)},
+            {"type": "Mobile Home", "min_price": 50000, "max_price": 150000, "size_range": (500, 1200), "bed_range": (1, 3), "bath_range": (1, 2)},
+            {"type": "Ranch-Style Home", "min_price": 120000, "max_price": 400000, "size_range": (1000, 2500), "bed_range": (2, 4), "bath_range": (1, 3)},
+            {"type": "Condo", "min_price": 120000, "max_price": 600000, "size_range": (700, 2000), "bed_range": (1, 3), "bath_range": (1, 2)}
+        ])
+
         listings_prompt = f"""
-        You are an experienced real estate agent with extensive knowledge of property listings across all 50 U.S. states,
-        covering a variety of neighborhoods from luxury estates to budget-friendly homes.
+        You are a real estate expert providing diverse listings.
 
-        Generate real estate listings using the following schema:
+        Generate a **{property_type['type']}** listing in **{city_data['city']}**, **{city_data['state']}**.
 
-        - Neighborhood: A real neighborhood in a randomly selected city
-        - City: The city where the property is located
-        - State: The state where the property is located
-        - Price: The property price, ranging from $100,000 to $5,000,000
-        - Bedrooms: Number of bedrooms, ranging from 1 to 15
-        - Bathrooms: Number of bathrooms, ranging from 1 to 5
-        - House Size: Property size, ranging from 500 sqft to 50,000 sqft
-        - Description: A 40-word description of the house.
-        - Neighborhood Description: A brief description of the neighborhood.
+        - Property Type: {property_type['type']}
+        - Neighborhood: A real neighborhood in {city_data['city']}
+        - City: {city_data['city']}
+        - State: {city_data['state']}
+        - Price: Between ${property_type['min_price']} and ${property_type['max_price']}
+        - Bedrooms: {property_type['bed_range'][0]} to {property_type['bed_range'][1]}
+        - Bathrooms: {property_type['bath_range'][0]} to {property_type['bath_range'][1]}
+        - House Size: Between {property_type['size_range'][0]} sqft and {property_type['size_range'][1]} sqft
+        - Description: A unique, engaging 80-word description.
+        - Neighborhood Description: A realistic description of the neighborhood.
 
         Higher-priced properties should have more bedrooms, bathrooms, and larger sizes.
 
@@ -168,8 +195,8 @@ class ListingsGenerator:
             prompt = (
                 f"A {random.choice(['modern', 'classic', 'Victorian', 'Mediterranean', 'ranch-style'])} house in "
                 f"{listing.get('Neighborhood', 'a neighborhood')}, {listing.get('City', 'a city')}, {listing.get('State', 'a state')}. "
-                # f"It has {listing.get('Bedrooms', 'an unknown number of')} bedrooms, "
-                # f"{listing.get('Bathrooms', 'an unknown number of')} bathrooms, and is "
+                f"It has {listing.get('Bedrooms', 'an unknown number of')} bedrooms, "
+                f"{listing.get('Bathrooms', 'an unknown number of')} bathrooms, and is "
                 f"{listing.get('House Size', 'unknown')} sqft. "
                 f"The house features a {random.choice(['red brick', 'white stucco', 'blue wooden', 'gray stone', 'tan adobe'])} exterior, "
                 f"a {random.choice(['spacious front yard', 'lush garden', 'swimming pool', 'rooftop terrace', 'wraparound porch'])}, and "

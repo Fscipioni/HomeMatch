@@ -133,8 +133,6 @@ class VectorDatabase:
             # Perform similarity search using the embedding
             results = self.vector_store.similarity_search_by_vector(query_embedding, k=k)
 
-            print('Original results: ', results, '\n')
-
             # Extract relevant metadata, including image paths
             listings_with_images = [
                 {

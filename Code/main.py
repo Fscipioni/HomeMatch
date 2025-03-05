@@ -8,11 +8,10 @@ from gradio_ui import create_gradio_interface
 
 """Generates listings, populates the vector DB, and simulates user input."""
     
-listings_path = "../Data/listings.json"
 vector_db = VectorDatabase()
     
 # Generate Listings if Not Present and Upload to Vector Database
-if not os.path.exists(listings_path):
+if not os.path.exists("../Data/listings.json"):
     print("📝 Listings file not found. Generating real estate listings...")
     generator = ListingsGenerator(total_listings=1000, batch_size=10)
     generator.generate_listings()
