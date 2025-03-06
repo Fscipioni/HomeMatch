@@ -22,9 +22,8 @@ if not os.path.exists("../Data/listings.json"):
 else:
     print("✅ Listings file found. Skipping generation and storing.")
 
-
 if __name__ == "__main__":
     demo = create_gradio_interface(vector_db)
-    # if demo is None:
-    #     raise ValueError("❌ create_gradio_interface() did not return a valid Gradio Blocks object.")
-    # demo.queue().launch(share=True, allowed_paths=["/Users/francescascipioni/Library/Mobile Documents/com~apple~CloudDocs/Work/Online courses/Nanodegrees/Generative AI Nanodegree/05 - Final Project/HomeMatch/Data/Images"])
+    if demo is None:
+        raise ValueError("❌ create_gradio_interface() did not return a valid Gradio Blocks object.")
+    demo.queue().launch(share=True, allowed_paths=["/Users/francescascipioni/Library/Mobile Documents/com~apple~CloudDocs/Work/Online courses/Nanodegrees/Generative AI Nanodegree/05 - Final Project/HomeMatch/Data/Images"])
