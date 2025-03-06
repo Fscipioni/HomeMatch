@@ -13,7 +13,7 @@ vector_db = VectorDatabase()
 # Generate Listings if Not Present and Upload to Vector Database
 if not os.path.exists("../Data/listings.json"):
     print("📝 Listings file not found. Generating real estate listings...")
-    generator = ListingsGenerator(total_listings=1000, batch_size=10)
+    generator = ListingsGenerator(total_listings=300, batch_size=5)
     generator.generate_listings()
 
     print("\n📥 Loading listings into ChromaDB...")
@@ -23,9 +23,8 @@ else:
     print("✅ Listings file found. Skipping generation and storing.")
 
 
-
 if __name__ == "__main__":
     demo = create_gradio_interface(vector_db)
-    if demo is None:
-        raise ValueError("❌ create_gradio_interface() did not return a valid Gradio Blocks object.")
-    demo.queue().launch(share=True, allowed_paths=["/Users/francescascipioni/Library/Mobile Documents/com~apple~CloudDocs/Work/Online courses/Nanodegrees/Generative AI Nanodegree/05 - Final Project/HomeMatch/Data/Images"])
+    # if demo is None:
+    #     raise ValueError("❌ create_gradio_interface() did not return a valid Gradio Blocks object.")
+    # demo.queue().launch(share=True, allowed_paths=["/Users/francescascipioni/Library/Mobile Documents/com~apple~CloudDocs/Work/Online courses/Nanodegrees/Generative AI Nanodegree/05 - Final Project/HomeMatch/Data/Images"])

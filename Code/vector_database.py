@@ -60,13 +60,14 @@ class VectorDatabase:
                 page_content=listing["Description"],  # Store property description
                 metadata={
                     "id": listing["id"],  
+                    "property_type": listing["Property Type"],
                     "neighborhood": listing["Neighborhood"],
                     "city": listing["City"],
                     "state": listing["State"],
                     "price": listing["Price"],
+                    "house_size": listing["House Size"],
                     "bedrooms": listing["Bedrooms"],
                     "bathrooms": listing["Bathrooms"],
-                    "house_size": listing["House Size"],
                     "neighborhood_description": listing["Neighborhood Description"],
                     "image_path": listing["image_path"]
                 }

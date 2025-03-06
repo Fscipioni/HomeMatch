@@ -36,10 +36,11 @@ def create_gradio_interface(vector_db):
             return text  # Return original input if LLM fails
         
     # **Search Function**
-    def search_houses(state, city, house_size, max_price, num_bedrooms, num_bathrooms, amenities, description, num_listings):
+    def search_houses(location, house_size, max_price, num_bedrooms, num_bathrooms, amenities, description, num_listings):
         """Retrieves property listings and enhances descriptions using LLM."""
         
         description = call_llm(description)  # Refine input description
+        city, state = location.split(", ")
 
         # **Format User Preferences**
         user_prefs = {
@@ -67,14 +68,16 @@ def create_gradio_interface(vector_db):
 
         # **Format Results for DataFrame Output**
         formatted_results = [
-            [
-                f"{result['bedrooms']} Bed | {result['bathrooms']} Bath | {result['house_size']} sq ft", # Title
-                f"${result['price']}",
-                f"{result['city']}, {result['state']}",
-                augmented_results[i] if i < len(augmented_results) else "N/A"
-            ]
+            {
+                "image": result["image_path"],
+                "title": f"{result['bedrooms']} Bed | {result['bathrooms']} Bath | {result['house_size']} sq ft",
+                "location": f"{result['state']}, {result['city']}, {result.get('neighborhood', 'N/A')}",
+                "price": f"${result['price']}",
+                "description": augmented_results[i] if i < len(augmented_results) else "N/A"
+            }
             for i, result in enumerate(search_results)
         ]
+        
         # print('search_results ', search_results, '\n')
         # **Extract Images for Gradio Gallery**
         image_paths = [result["image_path"] for result in search_results]
@@ -88,9 +91,28 @@ def create_gradio_interface(vector_db):
     with gr.Blocks() as demo:
         gr.Markdown("## Welcome to HomeMatch 🏡\nFill in your preferences and press 'Search' to find a home!")
 
+        city_list = ["Tucson, Arizona",
+                        "Los Angeles, California",
+                        "San Francisco, California",
+                        "Santa Barbara, California",
+                        "Denver, Colorado",
+                        "Atlanta, Georgia",
+                        "Honolulu, Hawaii",
+                        "Chicago, Illinois",
+                        "Boston, Massachusetts",
+                        "Baltimore, Maryland",
+                        "Portland, Maine",
+                        "Las Vegas, Nevada",
+                        "Newark, New Jersey",
+                        "New York City, New York",
+                        "Cincinnati, Ohio",
+                        "Pittsburgh, Pennsylvania",
+                        "Nashville, Tennessee",
+                        "Houston, Texas",
+                        "Salt Lake City, Utah",
+                        "New Orleans, Louisiana"]
         with gr.Row():
-            state = gr.Textbox(label="State", placeholder="Enter the state (e.g., California)")
-            city = gr.Textbox(label="City", placeholder="Enter the city (e.g., San Francisco)")
+            location = gr.Dropdown(city_list, label="Location", info='Where would you like to search for a property?')
             house_size = gr.Textbox(label="House Size (sq ft)", placeholder="e.g., 2000")
             max_price = gr.Textbox(label="Maximum Price", placeholder="e.g., 500000")
 
@@ -123,7 +145,7 @@ def create_gradio_interface(vector_db):
         # **Button Action**
         search_button.click(
             search_houses,
-            inputs=[state, city, house_size, max_price, num_bedrooms, num_bathrooms, amenities, description, num_listings],
+            inputs=[location, house_size, max_price, num_bedrooms, num_bathrooms, amenities, description, num_listings],
             outputs=[results_output, image_output]  # ✅ Now outputs images!
         )
 

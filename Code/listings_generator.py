@@ -90,7 +90,7 @@ class ListingsGenerator:
         - Price: Between ${property_type['min_price']} and ${property_type['max_price']}
         - Bedrooms: {property_type['bed_range'][0]} to {property_type['bed_range'][1]}
         - Bathrooms: {property_type['bath_range'][0]} to {property_type['bath_range'][1]}
-        - House Size: Between {property_type['size_range'][0]} sqft and {property_type['size_range'][1]} sqft
+        - House Size: Between {property_type['size_range'][0]} and {property_type['size_range'][1]} sqft
         - Description: A unique, engaging 80-word description.
         - Neighborhood Description: A realistic description of the neighborhood.
 
@@ -193,14 +193,13 @@ class ListingsGenerator:
 
             # Construct a safe prompt from the listing details
             prompt = (
-                f"A {random.choice(['modern', 'classic', 'Victorian', 'Mediterranean', 'ranch-style'])} house in "
+                f"A {listing.get('Property Type', 'house')} in "
                 f"{listing.get('Neighborhood', 'a neighborhood')}, {listing.get('City', 'a city')}, {listing.get('State', 'a state')}. "
                 f"It has {listing.get('Bedrooms', 'an unknown number of')} bedrooms, "
                 f"{listing.get('Bathrooms', 'an unknown number of')} bathrooms, and is "
                 f"{listing.get('House Size', 'unknown')} sqft. "
                 f"The house features a {random.choice(['red brick', 'white stucco', 'blue wooden', 'gray stone', 'tan adobe'])} exterior, "
-                f"a {random.choice(['spacious front yard', 'lush garden', 'swimming pool', 'rooftop terrace', 'wraparound porch'])}, and "
-                f"{listing.get('Description', 'a beautiful architectural design')}."
+                f"a {random.choice(['spacious front yard', 'lush garden', 'swimming pool', 'rooftop terrace', 'wraparound porch', 'spacious basement'])}."
                 )
 
             # Use a unique random seed for each image.
